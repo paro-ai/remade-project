@@ -1201,8 +1201,6 @@
 
         if (window.__speakRobot) {
           window.__speakRobot('You are being redirected to the website.', { delay: 0 });
-        } else {
-          window.__queuedRobotGreeting = { message: 'You are being redirected to the website.', delay: 0 };
         }
 
         setTimeout(() => {
@@ -1213,8 +1211,6 @@
           siteContent.style.visibility = 'visible';
           if (window.__speakRobot) {
             window.__speakRobot('Welcome to the main website. I am ready to guide you.', { delay: 220 });
-          } else {
-            window.__queuedRobotGreeting = { message: 'Welcome to the main website. I am ready to guide you.', delay: 220 };
           }
           setTimeout(() => intro.remove(), 400);
         }, 220);
