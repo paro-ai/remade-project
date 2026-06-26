@@ -21,6 +21,12 @@
       --muted: #9fb7c6;
     }
     *{box-sizing:border-box}
+    html{
+      font-size:16px;
+      -webkit-text-size-adjust:100%;
+      -ms-text-size-adjust:100%;
+      text-size-adjust:100%;
+    }
     html,body{height:100%}
     body{
       margin:0;
@@ -37,6 +43,9 @@
       align-items:flex-start;
       justify-content:center;
       position:relative;
+      overflow-x:hidden;
+      min-height:100dvh;
+      -webkit-tap-highlight-color:transparent;
     }
     body::before{
       content:"";
@@ -185,21 +194,44 @@
     }
 
     @media (max-width:760px){
-      body{padding:14px}
-      .wrap{gap:14px}
-      .hero{gap:12px}
+      body{padding:10px 10px calc(16px + env(safe-area-inset-bottom));}
+      .wrap{gap:14px; width:100%; max-width:100%; padding-bottom:20px}
+      .hero{gap:12px; flex-direction:column; align-items:flex-start}
       .hero-left{width:100%}
-      .hero-cta{flex-direction:column; align-items:stretch}
-      .btn{width:100%}
+      .hero-cta{flex-direction:column; align-items:stretch; width:100%; gap:8px}
+      .btn{width:100%; min-height:44px}
+      .title{font-size:clamp(22px, 5.4vw, 28px); line-height:1.08}
+      .subtitle{font-size:13px}
       .cube-stage{width:100%; height:240px}
-      .model-card{padding:14px}
-      .model-controls{width:100%}
+      .model-card{padding:14px; margin-top:20px}
+      .model-controls{width:100%; align-items:flex-start; min-width:0}
       .dim-panel{width:100%}
-      .timeline, .apps-grid{grid-template-columns:1fr}
+      .timeline, .apps-grid, .opportunity-grid{grid-template-columns:1fr}
       .flow{flex-direction:column; align-items:stretch}
       .flow .arrow{width:4px; height:24px; margin:4px 0}
-      .qr-placeholder{flex-direction:column; align-items:flex-start}
-      .qr-box{width:100%; max-width:140px}
+      .intro-center{padding:20px; max-width:min(92vw, 780px)}
+      .intro-title{font-size:clamp(20px, 5.4vw, 28px)}
+      .intro-subtitle{font-size:13px; line-height:1.5}
+      .intro-count{font-size:14px; padding:8px 12px}
+      .robot-assistant{right:8px; bottom:max(8px, env(safe-area-inset-bottom)); width:min(92vw, 320px)}
+      .robot-assistant img{width:72px; height:72px}
+      .robot-bubble{max-width:min(72vw, 220px); font-size:12px; padding:10px}
+      .flashcard-stage{justify-content:center}
+      .visit-timer-card, .task-helper-card{padding:12px}
+      .task-helper-card textarea{min-height:72px}
+    }
+
+    @media (max-width:480px){
+      body{padding:8px 8px calc(14px + env(safe-area-inset-bottom));}
+      .title{font-size:clamp(20px, 6vw, 24px)}
+      .hero-cta .btn{font-size:14px}
+      .model-card{padding:12px}
+      .robot-assistant{width:min(96vw, 300px)}
+      .robot-assistant img{width:64px; height:64px}
+      .robot-bubble{max-width:min(76vw, 210px)}
+      .intro-center{padding:16px}
+      .intro-title{font-size:clamp(18px, 6vw, 22px)}
+      .intro-subtitle{font-size:12px}
     }
 
     header.hero{
@@ -1190,12 +1222,15 @@
       body.classList.add('intro-active');
       let taps = 0;
       const maxTaps = 3;
+      let tapLock = false;
 
       function triggerVibration(force = false){
-        if (navigator.vibrate && (force || taps >= maxTaps)) {
-          navigator.vibrate([40, 30, 40]);
-          return;
-        }
+        try {
+          if (navigator.vibrate && (force || taps >= maxTaps)) {
+            navigator.vibrate([40, 30, 40]);
+            return;
+          }
+        } catch (error) {}
 
         intro.classList.remove('feedback-active');
         void intro.offsetWidth;
@@ -1226,6 +1261,10 @@
       }
 
       function handleTap(){
+        if (tapLock) return;
+        tapLock = true;
+        setTimeout(() => { tapLock = false; }, 220);
+
         taps += 1;
         countEl.textContent = `${taps} / ${maxTaps}`;
         countEl.classList.remove('pulse');
@@ -1244,6 +1283,12 @@
         event.preventDefault();
         handleTap();
       });
+      intro.addEventListener('touchstart', (event) => {
+        if (event.touches.length === 1) {
+          event.preventDefault();
+          handleTap();
+        }
+      }, { passive: false });
 
       document.addEventListener('keydown', (event) => {
         if (event.key === 'Enter' || event.key === ' ') {
@@ -1360,9 +1405,12 @@
         window.speechSynthesis.cancel();
         const utterance = new SpeechSynthesisUtterance(message);
         utterance.lang = 'en-US';
-        utterance.rate = 1.08;
-        utterance.pitch = 1.28;
+        utterance.rate = 1.05;
+        utterance.pitch = 1.18;
         utterance.volume = 0.92;
+        const voices = window.speechSynthesis.getVoices();
+        const preferredVoice = voices.find((voice) => voice.lang.startsWith('en')) || voices[0];
+        if (preferredVoice) utterance.voice = preferredVoice;
         window.speechSynthesis.speak(utterance);
       }
 
@@ -1406,7 +1454,10 @@
       });
 
       window.addEventListener('load', () => {
-        // The robot stays quiet on the intro screen and speaks only when the transition or a feature is activated.
+        if ('speechSynthesis' in window) {
+          window.speechSynthesis.cancel();
+          window.speechSynthesis.getVoices();
+        }
       });
 
       document.addEventListener('click', (event) => {
