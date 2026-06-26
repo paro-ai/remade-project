@@ -1344,6 +1344,11 @@
       });
 
       window.__speakRobot = showRobot;
+      if (window.__queuedRobotGreeting) {
+        const { message, delay } = window.__queuedRobotGreeting;
+        showRobot(message, { delay });
+        window.__queuedRobotGreeting = null;
+      }
 
       document.addEventListener('pointermove', (e) => {
         document.documentElement.style.setProperty('--mouse-x', `${e.clientX}px`);
