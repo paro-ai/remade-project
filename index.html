@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Journey of Artificial Intelligence</title>
   <style>
     :root{
@@ -21,10 +21,14 @@
       --muted: #9fb7c6;
     }
     *{box-sizing:border-box}
+    img, picture, svg, video, canvas { max-width:100%; height:auto; display:block; }
     html{
       font-size:16px;
       -webkit-text-size-adjust:100%;
       text-size-adjust:100%;
+      width:100%;
+      min-width:0;
+      overflow-x:hidden;
     }
     html,body{height:100%}
     body{
@@ -215,6 +219,9 @@
       .intro-center{padding:16px; max-width:96vw}
       .intro-title{font-size:clamp(18px, 6.8vw, 22px)}
       .intro-subtitle{font-size:12px}
+      .robot-assistant{width:min(280px, 88vw); bottom:12px; right:12px}
+      .robot-assistant img{width:min(84px, 18vw)}
+      .robot-bubble{max-width:calc(100vw - 128px)}
     }
 
     header.hero{
@@ -670,8 +677,8 @@
     }
     .robot-assistant.show{ right:18px; }
     .robot-assistant img{
-      width:96px;
-      height:96px;
+      width:min(96px, 20vw);
+      height:auto;
       object-fit:contain;
       filter:drop-shadow(0 12px 24px rgba(0,0,0,0.28));
       animation:robotFloat 2.2s ease-in-out infinite;
@@ -825,7 +832,7 @@
         <button class="robot-mute-btn" id="robotMuteBtn" type="button" aria-pressed="false">Mute</button>
       </div>
     </div>
-    <img src="images of robot.png" alt="Robot assistant" />
+    <img src="images-of-robot.png" alt="Robot assistant" />
   </div>
 
   <div class="wrap" id="siteContent" role="main">
